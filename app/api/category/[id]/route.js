@@ -1,6 +1,7 @@
 import dbConnect from "@/lib/db";
 import Category from "@/models/Category";
 
+// ✅ Get one category by id
 export async function GET(request, { params }) {
   await dbConnect();
   const category = await Category.findById(params.id);
@@ -8,6 +9,7 @@ export async function GET(request, { params }) {
   return Response.json(category);
 }
 
+// ✅ Delete category by id
 export async function DELETE(request, { params }) {
   await dbConnect();
   const deleted = await Category.findByIdAndDelete(params.id);

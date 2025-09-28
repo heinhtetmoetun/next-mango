@@ -7,6 +7,7 @@ import { DataGrid } from "@mui/x-data-grid";
 export default function ProductPage() {
   const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "/stock/api";
   const [productList, setProductList] = useState([]);
+  const [categories, setCategories] = useState([]);
   const { register, handleSubmit, reset } = useForm();
 
   const columns = [
@@ -41,16 +42,24 @@ export default function ProductPage() {
     },
   ];
 
+  // ✅ Fetch products with populated categories
   const fetchProducts = useCallback(async () => {
     const res = await fetch(`${API_BASE}/product`);
     const data = await res.json();
-    // ✅ make sure every row has an `id`
     setProductList(data.map((p) => ({ ...p, id: p._id })));
+  }, [API_BASE]);
+
+  // ✅ Fetch categories for dropdown
+  const fetchCategories = useCallback(async () => {
+    const res = await fetch(`${API_BASE}/category`);
+    const data = await res.json();
+    setCategories(data);
   }, [API_BASE]);
 
   useEffect(() => {
     fetchProducts();
-  }, [fetchProducts]);
+    fetchCategories();
+  }, [fetchProducts, fetchCategories]);
 
   const createProduct = (data) => {
     fetch(`${API_BASE}/product`, {
@@ -93,11 +102,17 @@ export default function ProductPage() {
           placeholder="Price"
           className="border p-2"
         />
-        <input
-          {...register("category")}
-          placeholder="Category ID"
-          className="border p-2"
-        />
+        
+        {/* ✅ Dropdown for categories */}
+        <select {...register("category", { required: true })} className="border p-2">
+          <option value="">Select category</option>
+          {categories.map((c) => (
+            <option key={c._id} value={c._id}>
+              {c.name}
+            </option>
+          ))}
+        </select>
+
         <div className="col-span-2">
           <button
             type="submit"

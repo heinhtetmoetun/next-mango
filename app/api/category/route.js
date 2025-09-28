@@ -1,33 +1,14 @@
 import dbConnect from "@/lib/db";
 import Category from "@/models/Category";
 
-export async function GET(request) {
+// ✅ Get all categories
+export async function GET() {
   await dbConnect();
-
-  const pno = request.nextUrl.searchParams.get("pno");
-  const s   = request.nextUrl.searchParams.get("s");
-
-  if (pno) {
-    const size = 3;
-    const startIndex = (Number(pno) - 1) * size;
-    const categories = await Category.find()
-      .sort({ order: -1 })
-      .skip(startIndex)
-      .limit(size);
-    return Response.json(categories);
-  }
-
-  if (s) {
-    const categories = await Category.find({
-      name: { $regex: s, $options: "i" },
-    }).sort({ order: -1 });
-    return Response.json(categories);
-  }
-
   const categories = await Category.find().sort({ order: -1 });
   return Response.json(categories);
 }
 
+// ✅ Create category
 export async function POST(request) {
   await dbConnect();
   const body = await request.json();
@@ -36,6 +17,7 @@ export async function POST(request) {
   return Response.json(category);
 }
 
+// ✅ Update category
 export async function PUT(request) {
   await dbConnect();
   const body = await request.json();
