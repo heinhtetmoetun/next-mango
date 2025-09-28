@@ -8,14 +8,14 @@ export default function Home() {
 
       <div className="flex gap-4">
         <Link
-          href="/category"
+          href="/stock/category"
           className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg"
         >
           Manage Categories
         </Link>
 
         <Link
-          href="/product"
+          href="/stock/product"
           className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg"
         >
           Manage Products

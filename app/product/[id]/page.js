@@ -1,29 +1,54 @@
+import Link from "next/link";
+
 export default async function ProductDetail({ params }) {
-  const API_BASE = process.env.NEXT_PUBLIC_API_BASE;
+  const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "/stock/api";
 
-  // fetch product by ID
+  // Fetch product by ID
   const res = await fetch(`${API_BASE}/product/${params.id}`, {
-    cache: "no-store", // ✅ always fresh
+    cache: "no-store",
   });
-  const product = await res.json();
 
-  if (!product || product.error) {
-    return <div className="m-4 text-red-600">Product not found.</div>;
+  if (!res.ok) {
+    return (
+      <div className="m-6 p-6 border rounded bg-red-50 text-red-600">
+        Product not found.
+      </div>
+    );
   }
 
+  const product = await res.json();
+
   return (
-    <div className="m-6 border p-6 rounded bg-gray-50">
-      <h1 className="text-2xl font-bold text-blue-800 mb-4">Product Details</h1>
+    <main className="m-6 p-6 border rounded bg-white shadow space-y-4">
+      <h1 className="text-2xl font-bold text-blue-800">Product Details</h1>
 
-      <p><span className="font-semibold">Name:</span> {product.name}</p>
-      <p><span className="font-semibold">Code:</span> {product.code}</p>
-      <p><span className="font-semibold">Description:</span> {product.description}</p>
-      <p><span className="font-semibold">Price:</span> {product.price} Baht</p>
-
+      <p>
+        <span className="font-semibold">Code:</span> {product.code}
+      </p>
+      <p>
+        <span className="font-semibold">Name:</span> {product.name}
+      </p>
+      <p>
+        <span className="font-semibold">Description:</span>{" "}
+        {product.description}
+      </p>
+      <p>
+        <span className="font-semibold">Price:</span>{" "}
+        {product.price?.toLocaleString()} Baht
+      </p>
       <p>
         <span className="font-semibold">Category:</span>{" "}
         {product.category ? product.category.name : "—"}
       </p>
-    </div>
+
+      <div className="pt-4">
+        <Link
+          href="/product"
+          className="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700"
+        >
+          ⬅ Back to Products
+        </Link>
+      </div>
+    </main>
   );
 }

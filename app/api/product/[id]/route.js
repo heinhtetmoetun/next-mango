@@ -1,7 +1,6 @@
 import dbConnect from "@/lib/db";
 import Product from "@/models/Product";
 
-// GET one product by id
 export async function GET(request, { params }) {
   await dbConnect();
   const product = await Product.findById(params.id).populate("category");
@@ -9,7 +8,6 @@ export async function GET(request, { params }) {
   return Response.json(product);
 }
 
-// DELETE one product by id
 export async function DELETE(request, { params }) {
   await dbConnect();
   const deleted = await Product.findByIdAndDelete(params.id);

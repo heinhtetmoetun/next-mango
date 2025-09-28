@@ -5,11 +5,11 @@ export async function GET(request) {
   await dbConnect();
 
   const pno = request.nextUrl.searchParams.get("pno");
-  const s = request.nextUrl.searchParams.get("s");
+  const s   = request.nextUrl.searchParams.get("s");
 
   if (pno) {
     const size = 3;
-    const startIndex = (pno - 1) * size;
+    const startIndex = (Number(pno) - 1) * size;
     const categories = await Category.find()
       .sort({ order: -1 })
       .skip(startIndex)
