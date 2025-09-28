@@ -1,128 +1,125 @@
 "use client";
-import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
+import Link from "next/link";
 
-export default function Home() {
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL;
-  console.debug("API_BASE", API_BASE);
-  const { register, handleSubmit } = useForm();
+export default function ProductPage() {
+  const API_BASE = process.env.NEXT_PUBLIC_API_BASE;
+  const { register, handleSubmit, reset } = useForm();
   const [products, setProducts] = useState([]);
-  const [category, setCategory] = useState([]);
+  const [categories, setCategories] = useState([]);
 
   async function fetchProducts() {
-    const data = await fetch(`${API_BASE}/product`);
-    // const data = await fetch(`http://localhost:3000/product`);
-    const p = await data.json();
-    setProducts(p);
+    const res = await fetch(`${API_BASE}/product`);
+    setProducts(await res.json());
   }
 
-  async function fetchCategory() {
-    const data = await fetch(`${API_BASE}/category`);
-    const c = await data.json();
-    setCategory(c);
+  async function fetchCategories() {
+    const res = await fetch(`${API_BASE}/category`);
+    setCategories(await res.json());
   }
+
+  useEffect(() => {
+    fetchProducts();
+    fetchCategories();
+  }, []);
 
   const createProduct = (data) => {
     fetch(`${API_BASE}/product`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
-    }).then(() => fetchProducts());
+    }).then(() => {
+      reset();
+      fetchProducts();
+    });
   };
 
-  const deleteById = (id) => async () => {
+  const deleteProduct = async (id) => {
     if (!confirm("Are you sure?")) return;
-    
-    await fetch(`${API_BASE}/product/${id}`, {
-      method: "DELETE",
-    });
+    await fetch(`${API_BASE}/product/${id}`, { method: "DELETE" });
     fetchProducts();
-  }
-
-  useEffect(() => {
-    fetchCategory();
-    fetchProducts();
-  }, []);
+  };
 
   return (
-    <div className="flex flex-row gap-4">
-      <div className="flex-1 w-64 ">
-        <form onSubmit={handleSubmit(createProduct)}>
-          <div className="grid grid-cols-2 gap-4 m-4 w-1/2">
-            <div>Code:</div>
-            <div>
-              <input
-                name="code"
-                type="text"
-                {...register("code", { required: true })}
-                className="border border-black w-full"
-              />
-            </div>
-            <div>Name:</div>
-            <div>
-              <input
-                name="name"
-                type="text"
-                {...register("name", { required: true })}
-                className="border border-black w-full"
-              />
-            </div>
-            <div>Description:</div>
-            <div>
-              <textarea
-                name="description"
-                {...register("description", { required: true })}
-                className="border border-black w-full"
-              />
-            </div>
-            <div>Price:</div>
-            <div>
-              <input
-                name="name"
-                type="number"
-                {...register("price", { required: true })}
-                className="border border-black w-full"
-              />
-            </div>
-            <div>Category:</div>
-            <div>
-              <select
-                name="category"
-                {...register("category", { required: true })}
-                className="border border-black w-full"
-              >
-                {category.map((c) => (
-                  <option key={c._id} value={c._id}>{c.name}</option>
-                ))}
-              </select>
-            </div>
-            <div className="col-span-2">
-              <input
-                type="submit"
-                value="Add"
-                className="bg-blue-800 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full"
-              />
-            </div>
-          </div>
-        </form>
-      </div>
-      <div className="border m-4 bg-slate-300 flex-1 w-64">
-        <h1 className="text-2xl">Products ({products.length})</h1>
-        <ul className="list-disc ml-8">
-          {
-            products.map((p) => (
-              <li key={p._id}>
-                <button className="border border-black p-1/2" onClick={deleteById(p._id)}>❌</button>{' '}
-                <Link href={`/product/${p._id}`} className="font-bold">
-                  {p.name}
-                </Link>{" "}
-                - {p.description}
-              </li>
+    <div className="flex gap-6 p-6">
+      {/* Product Form */}
+      <form
+        onSubmit={handleSubmit(createProduct)}
+        className="w-1/3 border p-4 rounded bg-white shadow"
+      >
+        <h2 className="font-bold text-lg mb-4">Add Product</h2>
+        <div className="mb-3">
+          <label className="block text-sm">Code:</label>
+          <input {...register("code")} className="border p-2 w-full" />
+        </div>
+        <div className="mb-3">
+          <label className="block text-sm">Name:</label>
+          <input {...register("name", { required: true })} className="border p-2 w-full" />
+        </div>
+        <div className="mb-3">
+          <label className="block text-sm">Description:</label>
+          <textarea {...register("description")} className="border p-2 w-full" />
+        </div>
+        <div className="mb-3">
+          <label className="block text-sm">Price:</label>
+          <input type="number" {...register("price", { required: true })} className="border p-2 w-full" />
+        </div>
+        <div className="mb-3">
+          <label className="block text-sm">Category:</label>
+          <select {...register("category", { required: true })} className="border p-2 w-full">
+            <option value="">Select category</option>
+            {categories.map((c) => (
+              <option key={c._id} value={c._id}>
+                {c.name}
+              </option>
             ))}
-        </ul>
+          </select>
+        </div>
+        <button type="submit" className="bg-blue-600 text-white px-4 py-2 w-full rounded">
+          Add Product
+        </button>
+      </form>
+
+      {/* Product Table */}
+      <div className="w-2/3 border p-4 bg-gray-50 rounded shadow">
+        <h2 className="font-bold text-lg mb-4">Products ({products.length})</h2>
+        <table className="w-full border-collapse">
+          <thead>
+            <tr className="bg-gray-200 text-left">
+              <th className="border p-2">Code</th>
+              <th className="border p-2">Name</th>
+              <th className="border p-2">Description</th>
+              <th className="border p-2">Price</th>
+              <th className="border p-2">Category</th>
+              <th className="border p-2">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {products.map((p) => (
+              <tr key={p._id} className="hover:bg-gray-100">
+                <td className="border p-2">{p.code}</td>
+                <td className="border p-2 font-bold text-blue-700">
+                  <Link href={`/product/${p._id}`}>{p.name}</Link>
+                </td>
+                <td className="border p-2">{p.description}</td>
+                <td className="border p-2">{p.price.toLocaleString()}</td>
+                <td className="border p-2">{p.category?.name || "—"}</td>
+                <td className="border p-2">
+                  <button
+                    onClick={() => deleteProduct(p._id)}
+                    className="text-red-600 mr-2"
+                  >
+                    🗑️
+                  </button>
+                  <Link href={`/product/${p._id}`} className="text-blue-600">
+                    ✏️
+                  </Link>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );
