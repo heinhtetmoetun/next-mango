@@ -9,7 +9,7 @@ export default function Home() {
       <p className="text-gray-700">Choose a section:</p>
 
       <div className="flex gap-4">
-        {/* ✅ Next.js automatically adds /stock prefix because of basePath */}
+        {/* ✅ No /stock here, Next.js basePath will add it automatically */}
         <Link
           href="/category"
           className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg"
