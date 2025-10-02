@@ -1,11 +1,27 @@
-# Product App
-Next.js 14
-This app shows
-1. MongoDB CRUD operations using Mongoose
-2. Client Components interacting with APIs
-3. Server Components Interacting with Server Actions
+# Final Exam: Fin-Customer App
 
-# Setup
-1. Define in .env the followings
-1.1 MONGODB_URI
-1.2 NEXT_PUBLIC_API_URL
+## Overview
+This is a Next.js + MongoDB CRUD application with three modules:
+- Category
+- Product
+- Customer
+
+Each module supports full Create, Read, Update, Delete (CRUD).
+
+## Features
+- RESTful API routes under `/fin-customer/api`
+- Frontend pages with forms + DataGrid for management
+- MongoDB Atlas as database
+- PM2 + Nginx for deployment on Azure VM
+
+## Live Demo
+- Home: http://20.2.209.34/fin-customer
+- Categories: http://20.2.209.34/fin-customer/category
+- Products: http://20.2.209.34/fin-customer/product
+- Customers: http://20.2.209.34/fin-customer/customer
+
+## Deployment
+- Node.js v22 + PNPM
+- Build with `pnpm build`
+- Run with PM2 using `ecosystem.config.js`
+- Reverse proxy via Nginx
