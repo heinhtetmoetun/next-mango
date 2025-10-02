@@ -9,7 +9,7 @@ export default function Home() {
       <p className="text-gray-700">Choose a section:</p>
 
       <div className="flex gap-4">
-        {/* ✅ No /stock here, Next.js basePath will add it automatically */}
+        {/* ✅ No /fin-customer here, Next.js basePath will add it automatically */}
         <Link
           href="/category"
           className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg"
@@ -23,8 +23,14 @@ export default function Home() {
         >
           Manage Products
         </Link>
+
+        <Link
+          href="/customer"
+          className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg"
+        >
+          Manage Customers
+        </Link>
       </div>
     </main>
   );
 }
-
