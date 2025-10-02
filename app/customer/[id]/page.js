@@ -1,21 +1,38 @@
+"use client";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
-export default async function CustomerDetail({ params }) {
+export default function CustomerDetail({ params }) {
   const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "/fin-customer/api";
+  const [customer, setCustomer] = useState(null);
+  const [error, setError] = useState(null);
 
-  const res = await fetch(`${API_BASE}/customer/${params.id}`, {
-    cache: "no-store",
-  });
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await fetch(`${API_BASE}/customer/${params.id}`, {
+          cache: "no-store",
+        });
+        if (!res.ok) throw new Error("Failed to fetch customer");
+        const data = await res.json();
+        setCustomer(data);
+      } catch (err) {
+        setError(err.message);
+      }
+    })();
+  }, [API_BASE, params.id]);
 
-  if (!res.ok) {
+  if (error) {
     return (
       <div className="m-6 p-6 border rounded bg-red-50 text-red-600">
-        Customer not found.
+        Error: {error}
       </div>
     );
   }
 
-  const customer = await res.json();
+  if (!customer) {
+    return <p className="p-6">Loading...</p>;
+  }
 
   return (
     <main className="m-6 p-6 border rounded bg-white shadow space-y-4">
@@ -39,14 +56,14 @@ export default async function CustomerDetail({ params }) {
 
       <div className="flex gap-4 pt-4">
         <Link
-          href={`/customer/${customer._id}/edit`}   {/* ✅ FIXED */}
+          href={`/fin-customer/customer/${customer._id}/edit`}
           className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
         >
           ✏️ Edit
         </Link>
 
         <Link
-          href="/customer"
+          href="/fin-customer/customer"
           className="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700"
         >
           ⬅ Back to Customers

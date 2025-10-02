@@ -11,7 +11,7 @@ export default function EditCustomer({ params }) {
   useEffect(() => {
     (async () => {
       try {
-        const res = await fetch(`${API_BASE}/customer/${id}`, { cache: "no-store" });
+        const res = await fetch(`${API_BASE}/customer/${id}`);
         if (res.ok) {
           const data = await res.json();
           reset({
@@ -21,31 +21,29 @@ export default function EditCustomer({ params }) {
             interests: data.interests,
           });
         } else {
-          setMsg("Failed to load customer data");
+          setMsg("Failed to load customer");
         }
       } catch (err) {
-        setMsg("Error loading data");
+        setMsg("Error fetching data");
       }
     })();
   }, [API_BASE, id, reset]);
 
   const onSubmit = async (form) => {
     try {
-      const res = await fetch(`${API_BASE}/customer`, {
+      const res = await fetch(`${API_BASE}/customer/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ _id: id, ...form }),
+        body: JSON.stringify(form),
       });
-
       if (res.ok) {
-        // redirect back to list (safer than detail page if not required)
-        window.location.href = `/fin-customer/customer`;
+        window.location.href = `/fin-customer/customer/${id}`;
       } else {
         const error = await res.json();
         setMsg(error.error || "Update failed");
       }
     } catch (err) {
-      setMsg("Update failed due to server error");
+      setMsg("Request failed");
     }
   };
 
@@ -57,13 +55,38 @@ export default function EditCustomer({ params }) {
         onSubmit={handleSubmit(onSubmit)}
         className="grid gap-4 border p-4 bg-white rounded shadow"
       >
-        <input {...register("name", { required: true })} placeholder="Name" className="border p-2" />
-        <input type="date" {...register("dateOfBirth", { required: true })} className="border p-2" />
-        <input type="number" {...register("memberNumber", { required: true, valueAsNumber: true })} placeholder="Member Number" className="border p-2" />
-        <input {...register("interests")} placeholder="Interests" className="border p-2" />
+        <input
+          {...register("name", { required: true })}
+          placeholder="Name"
+          className="border p-2"
+        />
+        <input
+          type="date"
+          {...register("dateOfBirth", { required: true })}
+          className="border p-2"
+        />
+        <input
+          type="number"
+          {...register("memberNumber", {
+            required: true,
+            valueAsNumber: true,
+          })}
+          placeholder="Member Number"
+          className="border p-2"
+        />
+        <input
+          {...register("interests")}
+          placeholder="Interests"
+          className="border p-2"
+        />
 
         {msg && <p className="text-red-600">{msg}</p>}
-        <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">Save</button>
+        <button
+          type="submit"
+          className="bg-blue-600 text-white px-4 py-2 rounded"
+        >
+          Save
+        </button>
       </form>
     </main>
   );
