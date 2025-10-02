@@ -8,6 +8,7 @@ export default function EditCustomer({ params }) {
   const { register, handleSubmit, reset } = useForm();
   const [msg, setMsg] = useState("");
 
+  // Load customer data into form
   useEffect(() => {
     (async () => {
       try {
@@ -29,12 +30,13 @@ export default function EditCustomer({ params }) {
     })();
   }, [API_BASE, id, reset]);
 
+  // ✅ onSubmit is here
   const onSubmit = async (form) => {
     try {
-      const res = await fetch(`${API_BASE}/customer/${id}`, {
+      const res = await fetch(`${API_BASE}/customer`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ _id: id, ...form }),  // must include _id
       });
       if (res.ok) {
         window.location.href = `/fin-customer/customer/${id}`;
@@ -52,41 +54,16 @@ export default function EditCustomer({ params }) {
       <h1 className="text-2xl font-bold text-blue-800">Edit Customer</h1>
 
       <form
-        onSubmit={handleSubmit(onSubmit)}
+        onSubmit={handleSubmit(onSubmit)}   // ✅ form uses onSubmit here
         className="grid gap-4 border p-4 bg-white rounded shadow"
       >
-        <input
-          {...register("name", { required: true })}
-          placeholder="Name"
-          className="border p-2"
-        />
-        <input
-          type="date"
-          {...register("dateOfBirth", { required: true })}
-          className="border p-2"
-        />
-        <input
-          type="number"
-          {...register("memberNumber", {
-            required: true,
-            valueAsNumber: true,
-          })}
-          placeholder="Member Number"
-          className="border p-2"
-        />
-        <input
-          {...register("interests")}
-          placeholder="Interests"
-          className="border p-2"
-        />
+        <input {...register("name", { required: true })} placeholder="Name" className="border p-2" />
+        <input type="date" {...register("dateOfBirth", { required: true })} className="border p-2" />
+        <input type="number" {...register("memberNumber", { required: true, valueAsNumber: true })} placeholder="Member Number" className="border p-2" />
+        <input {...register("interests")} placeholder="Interests" className="border p-2" />
 
         {msg && <p className="text-red-600">{msg}</p>}
-        <button
-          type="submit"
-          className="bg-blue-600 text-white px-4 py-2 rounded"
-        >
-          Save
-        </button>
+        <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">Save</button>
       </form>
     </main>
   );

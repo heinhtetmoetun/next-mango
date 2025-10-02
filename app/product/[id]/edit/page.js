@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 
 export default function EditProduct({ params }) {
+  // Use relative base just like Customer
   const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "/fin-customer/api";
   const id = params.id;
   const { register, handleSubmit, reset } = useForm();
@@ -11,7 +12,13 @@ export default function EditProduct({ params }) {
   useEffect(() => {
     (async () => {
       try {
-        const res = await fetch(`${API_BASE}/product/${id}`);
+        // ✅ Always prefix with window.location.origin if SSR tries
+        const url =
+          typeof window === "undefined"
+            ? `http://localhost:3001${API_BASE}/product/${id}`
+            : `${API_BASE}/product/${id}`;
+
+        const res = await fetch(url, { cache: "no-store" });
         if (res.ok) {
           const data = await res.json();
           reset({
@@ -24,7 +31,7 @@ export default function EditProduct({ params }) {
         } else {
           setMsg("Failed to load product");
         }
-      } catch (err) {
+      } catch {
         setMsg("Error fetching data");
       }
     })();
@@ -32,10 +39,15 @@ export default function EditProduct({ params }) {
 
   const onSubmit = async (form) => {
     try {
-      const res = await fetch(`${API_BASE}/product/${id}`, {
+      const url =
+        typeof window === "undefined"
+          ? `http://localhost:3001${API_BASE}/product`
+          : `${API_BASE}/product`;
+
+      const res = await fetch(url, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ _id: id, ...form }),
       });
       if (res.ok) {
         window.location.href = `/fin-customer/product/${id}`;
@@ -43,7 +55,7 @@ export default function EditProduct({ params }) {
         const error = await res.json();
         setMsg(error.error || "Update failed");
       }
-    } catch (err) {
+    } catch {
       setMsg("Request failed");
     }
   };

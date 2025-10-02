@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { DataGrid } from "@mui/x-data-grid";
 
 export default function ProductPage() {
-  const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "/stock/api";
+  const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "/fin-customer/api";
   const [productList, setProductList] = useState([]);
   const [categories, setCategories] = useState([]);
   const { register, handleSubmit, reset } = useForm();
@@ -34,22 +34,20 @@ export default function ProductPage() {
             >
               🗑️
             </button>
-            <a href={`/product/${params.row._id}`} className="text-blue-600">
-              ✏️
+            <a href={`/fin-customer/product/${params.row._id}`} className="text-blue-600">
+              🔍
             </a>
           </div>
         ) : null,
     },
   ];
 
-  // ✅ Fetch products with populated categories
   const fetchProducts = useCallback(async () => {
     const res = await fetch(`${API_BASE}/product`);
     const data = await res.json();
     setProductList(data.map((p) => ({ ...p, id: p._id })));
   }, [API_BASE]);
 
-  // ✅ Fetch categories for dropdown
   const fetchCategories = useCallback(async () => {
     const res = await fetch(`${API_BASE}/category`);
     const data = await res.json();
@@ -80,30 +78,15 @@ export default function ProductPage() {
 
   return (
     <main className="p-6 space-y-6">
-      {/* Form */}
       <form
         onSubmit={handleSubmit(createProduct)}
         className="grid grid-cols-2 gap-4 border p-4 bg-white rounded shadow"
       >
         <input {...register("code")} placeholder="Code" className="border p-2" />
-        <input
-          {...register("name", { required: true })}
-          placeholder="Name"
-          className="border p-2"
-        />
-        <textarea
-          {...register("description")}
-          placeholder="Description"
-          className="border p-2 col-span-2"
-        />
-        <input
-          type="number"
-          {...register("price", { required: true, valueAsNumber: true })}
-          placeholder="Price"
-          className="border p-2"
-        />
-        
-        {/* ✅ Dropdown for categories */}
+        <input {...register("name", { required: true })} placeholder="Name" className="border p-2" />
+        <textarea {...register("description")} placeholder="Description" className="border p-2 col-span-2" />
+        <input type="number" {...register("price", { required: true, valueAsNumber: true })} placeholder="Price" className="border p-2" />
+
         <select {...register("category", { required: true })} className="border p-2">
           <option value="">Select category</option>
           {categories.map((c) => (
@@ -114,23 +97,14 @@ export default function ProductPage() {
         </select>
 
         <div className="col-span-2">
-          <button
-            type="submit"
-            className="bg-blue-600 text-white px-4 py-2 rounded"
-          >
+          <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">
             Add Product
           </button>
         </div>
       </form>
 
-      {/* DataGrid */}
       <div className="m-4 bg-white p-2 rounded shadow">
-        <DataGrid
-          rows={productList}
-          columns={columns}
-          autoHeight
-          disableRowSelectionOnClick
-        />
+        <DataGrid rows={productList} columns={columns} autoHeight disableRowSelectionOnClick />
       </div>
     </main>
   );
